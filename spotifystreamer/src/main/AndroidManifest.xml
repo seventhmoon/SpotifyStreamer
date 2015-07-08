@@ -41,7 +41,8 @@
         </activity>
         <activity
             android:name=".LandingActivity"
-            android:label="@string/title_activity_landing" >
+            android:label="@string/title_activity_landing"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />
@@ -49,12 +50,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".LandingActivity" />
+        </activity>
+        <activity
+            android:name=".TrackListActivity"
+            android:label="@string/title_activity_tracks_list"
+            android:parentActivityName=".LandingActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="idv.seventhmoon.spotifystreamer.LandingActivity" />
         </activity>
     </application>
 

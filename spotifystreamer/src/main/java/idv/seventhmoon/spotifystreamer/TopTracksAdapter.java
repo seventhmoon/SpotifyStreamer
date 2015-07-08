@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.spotify.api.model.Album;
+import com.spotify.api.model.Image;
+import com.spotify.api.model.Track;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -19,8 +20,17 @@ import java.util.List;
 public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.ViewHolder> {
 
 
-    private List<Album> mAlbums;
+    private List<Track> mTracks;
     private Context mContext;
+    private TrackListFragment.OnFragmentInteractionListener mListener;
+
+
+    public TopTracksAdapter(Context context, List<Track> tracks, TrackListFragment.OnFragmentInteractionListener listener) {
+        mTracks = tracks;
+        mContext = context;
+        mListener = listener;
+
+    }
 
 
     // Provide a reference to the views for each data item
@@ -28,21 +38,18 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView mTextAlbumName;
-        public ImageView mImageAlbumCover;
+        public TextView mTextViewAlbum;
+        public TextView mTextViewTrack;
+        public ImageView mImageViewThumbnail;
+        public View mRootView;
+
         public ViewHolder(View rootView) {
             super(rootView);
-//            mTextView = rootView;
 
-
+            mRootView = rootView;
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public TopTracksAdapter(Context context, List<Album> albums){
-        mAlbums = albums;
-        mContext = context;
-    }
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -50,12 +57,14 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
                                                    int viewType) {
         // create a new view
         View rootView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.listitem_album, parent, false);
+                .inflate(R.layout.listitem_track, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(rootView);
-        vh.mTextAlbumName = (TextView) rootView.findViewById(R.id.text_album_name);
-        vh.mImageAlbumCover = (ImageView) rootView.findViewById(R.id.image_album_cover);
+        vh.mImageViewThumbnail = (ImageView) rootView.findViewById(R.id.image_thumbnail);
+        vh.mTextViewAlbum = (TextView) rootView.findViewById(R.id.text_album);
+        vh.mTextViewTrack = (TextView) rootView.findViewById(R.id.text_track);
+
 
         return vh;
     }
@@ -67,16 +76,27 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
         // - replace the contents of the view with that element
 //        holder.mTextView.setText(mDataset[position]);
 
-        Album album = mAlbums.get(position);
-        holder.mTextAlbumName.setText(album.getName());
-        Picasso.with(mContext).load(album.getImages().get(0).getUrl()).fit().centerCrop().into(holder.mImageAlbumCover);
+        final Track track = mTracks.get(position);
+        holder.mTextViewAlbum.setText(track.getAlbum().getName());
+        holder.mTextViewTrack.setText(track.getName());
+
+        List<Image> images = track.getAlbum().getImages();
+        if (!images.isEmpty()){
+            Picasso.with(mContext).load(images.get(0).getUrl()).fit().centerCrop().into(holder.mImageViewThumbnail);
+        }
+
+        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onTrackSelected(track.getId());
+            }
+        });
 
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-//        return mDataset.length;
-        return mAlbums.size();
+        return mTracks.size();
     }
 }

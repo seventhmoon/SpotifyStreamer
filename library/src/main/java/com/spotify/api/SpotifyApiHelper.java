@@ -3,12 +3,14 @@ package com.spotify.api;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.spotify.api.model.GetArtistsTopTracksResponseModel;
 import com.spotify.api.model.SearchAlbumResponseModel;
 import com.spotify.api.model.SearchArtistResponseModel;
 import com.spotify.api.network.GsonObjectRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,6 +20,7 @@ import java.util.TreeMap;
 public class SpotifyApiHelper {
 
     public static final String SEARCH_URL = "https://api.spotify.com/v1/search";
+    public static final String GET_TOP_TRACKS_URL = "https://api.spotify.com/v1/artists/%1$s/top-tracks";
 
     private RequestQueue mRequestQueue;
     public SpotifyApiHelper(RequestQueue requestQueue){
@@ -34,6 +37,25 @@ public class SpotifyApiHelper {
 
         GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
                 url, SearchArtistResponseModel.class, null, listener, errorListener);
+
+        // Adding request to request queue
+        return mRequestQueue.add(gsonReq);
+
+    }
+
+    public Request searchArtistsTopTracks(String artistId,  Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener){
+        return searchArtistsTopTracks(artistId, Locale.getDefault().getCountry(), listener, errorListener);
+    }
+
+    public Request searchArtistsTopTracks(String artistId, String countryCode, Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener){
+        TreeMap<String, String> params = new TreeMap<>();
+
+        params.put("country", countryCode);
+
+        String url = String.format(GET_TOP_TRACKS_URL,artistId) + "?" + toUrlParams(params);
+
+        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+                url, GetArtistsTopTracksResponseModel.class, null, listener, errorListener);
 
         // Adding request to request queue
         return mRequestQueue.add(gsonReq);

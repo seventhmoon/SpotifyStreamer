@@ -10,7 +10,7 @@ import java.util.List;
 public class GetArtistsTopTracksResponseModel {
 
 
-    @SerializedName("albums")
+    @SerializedName("tracks")
     private List<Track> tracks;
 
 

@@ -1,13 +1,26 @@
 package idv.seventhmoon.spotifystreamer;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.spotify.api.SpotifyApiHelper;
+import com.spotify.api.model.GetArtistsTopTracksResponseModel;
+import com.spotify.api.model.Track;
+
+import java.util.List;
+
+//receive keyword from activity, call API, display result
+//when cell clicked, pass the albumId to search tracks
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,9 +32,21 @@ import android.view.ViewGroup;
  */
 public class TrackListFragment extends Fragment {
 
-    private static final String ARG_ALBUM_ID = "albumId";
+    public static final String TAG = TrackListFragment.class.getSimpleName();
 
-    private String mAlbumId;
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    public static final String ARG_ARTIST_ID = "artistId";
+
+
+    private MainApplication mApplication;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private TextView mTextViewSearching;
+
+    private String mArtistId;
+
 
 
     private OnFragmentInteractionListener mListener;
@@ -30,14 +55,16 @@ public class TrackListFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param albumId Parameter 1.
-     * @return A new instance of fragment TrackListFragment.
+     * @param artistId  keyword for searching album
+
+     * @return A new instance of fragment ArtistListFragment.
      */
-    public static TrackListFragment newInstance(String albumId) {
+
+    public static TrackListFragment newInstance(String artistId) {
         TrackListFragment fragment = new TrackListFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_ARTIST_ID, artistId);
 
-        args.putString(ARG_ALBUM_ID, albumId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,23 +77,40 @@ public class TrackListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mAlbumId = getArguments().getString(ARG_ALBUM_ID);
+            mArtistId = getArguments().getString(ARG_ARTIST_ID);
+
         }
+        mApplication = (MainApplication) getActivity().getApplication();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_top_tracks, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_track_list, container, false);
+        mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(mApplication);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        searchForTrack(mArtistId);
+
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onTrackSelected(String trackId){
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onTrackSelected(trackId);
         }
     }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -96,8 +140,46 @@ public class TrackListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+
+        public void onTrackSelected(String trackId);
+
+    }
+
+    private void displayResult(){
+        mTextViewSearching.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void searchForTrack(String artistId){
+
+        SpotifyApiHelper spotifyApiHelper = new SpotifyApiHelper(mApplication.getRequestQueue());
+        spotifyApiHelper.searchArtistsTopTracks(artistId, new Response.Listener<GetArtistsTopTracksResponseModel>() {
+            @Override
+            public void onResponse(GetArtistsTopTracksResponseModel response) {
+
+//                List<Artist> artists = response.getArtists().getArtists();
+                List<Track> tracks = response.getTracks();
+                if (tracks.isEmpty()) {
+                    //show no result page
+
+                } else {
+
+                    mAdapter = new TopTracksAdapter(mApplication, tracks, mListener);
+                    Log.d(TAG, tracks.toString());
+                    mRecyclerView.setAdapter(mAdapter);
+
+                    displayResult();
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        });
+
     }
 
 }

@@ -12,7 +12,7 @@ public class Track {
     @SerializedName("album")
     private Album album;
     @SerializedName("artists")
-    private Artists artists;
+    private List<Artist> artists;
     @SerializedName("available_markets")
     private List<String> availableMarkets;
     @SerializedName("disk_number")
@@ -50,11 +50,11 @@ public class Track {
         this.album = album;
     }
 
-    public Artists getArtists() {
+    public List<Artist> getArtists() {
         return artists;
     }
 
-    public void setArtists(Artists artists) {
+    public void setArtists(List<Artist> artists) {
         this.artists = artists;
     }
 

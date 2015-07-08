@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.Toast;
 
 
 public class LandingActivity extends AppCompatActivity implements ArtistListFragment.OnFragmentInteractionListener {
@@ -29,19 +28,6 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_landing);
-
-//        mApplication = (MainApplication) this.getApplication();
-//
-//        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-//        mRecyclerView.setHasFixedSize(true);
-
-//        // use a linear layout manager
-//        mLayoutManager = new LinearLayoutManager(this);
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-
         handleIntent(getIntent());
     }
 
@@ -83,6 +69,12 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
     @Override
     public void onArtistSelected(String artistId) {
-        Toast.makeText(this, artistId, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, artistId, Toast.LENGTH_SHORT).show();
+
+        Intent detailIntent = new Intent(this,
+                TrackListActivity.class);
+        detailIntent.putExtra(TrackListFragment.ARG_ARTIST_ID, artistId);
+        startActivity(detailIntent);
+
     }
 }
