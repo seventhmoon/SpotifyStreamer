@@ -43,6 +43,7 @@ public class ArtistListFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private TextView mTextViewSearching;
+    private TextView mTextViewNoResult;
 
     private String mSearchKeyword;
     private int mSearchLimit;
@@ -89,6 +90,7 @@ public class ArtistListFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_artist_list, container, false);
         mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
+        mTextViewNoResult = (TextView) rootView.findViewById(R.id.text_no_result);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -104,9 +106,9 @@ public class ArtistListFragment extends Fragment {
         return rootView;
     }
 
-    public void onArtistSelected(String artistId){
+    public void onArtistSelected(String artistId, String artistName){
         if (mListener != null) {
-            mListener.onArtistSelected(artistId);
+            mListener.onArtistSelected(artistId, artistName);
         }
     }
 
@@ -140,16 +142,30 @@ public class ArtistListFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        public void onArtistSelected(String artistId);
+        public void onArtistSelected(String artistId, String artistName);
 
+    }
+
+    private void displaySearching(){
+        mTextViewSearching.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        mTextViewNoResult.setVisibility(View.GONE);
     }
 
     private void displayResult(){
         mTextViewSearching.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
+        mTextViewNoResult.setVisibility(View.GONE);
+    }
+
+    private void displayNoResult(){
+        mTextViewSearching.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+        mTextViewNoResult.setVisibility(View.VISIBLE);
     }
 
     private void searchForArtist(String query, int limit){
+        displaySearching();
 
         SpotifyApiHelper spotifyApiHelper = new SpotifyApiHelper(mApplication.getRequestQueue());
         spotifyApiHelper.searchArtist(query, limit, new Response.Listener<SearchArtistResponseModel>() {
@@ -159,7 +175,7 @@ public class ArtistListFragment extends Fragment {
                 List<Artist> artists = response.getArtists().getArtists();
                 if (artists.isEmpty()) {
                     //show no result page
-
+                    displayNoResult();
                 } else {
 
                     mAdapter = new SearchArtistResultAdapter(mApplication, artists, mListener);

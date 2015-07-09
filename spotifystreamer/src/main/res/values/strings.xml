@@ -22,4 +22,6 @@
     <string name="desc_play">play</string>
     <string name="desc_pause">pause</string>
     <string name="title_activity_tracks_list">TracksListActivity</string>
+    <string name="text_no_result">No Result</string>
+    <string name="text_top_10_tracks">Top 10 Tracks</string>
 </resources>

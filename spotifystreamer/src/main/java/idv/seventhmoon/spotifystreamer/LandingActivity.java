@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.TextView;
 
 
 public class LandingActivity extends AppCompatActivity implements ArtistListFragment.OnFragmentInteractionListener {
@@ -22,12 +24,16 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private TextView mTextIntro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_landing);
+
+        mTextIntro = (TextView) findViewById(R.id.text_intro);
+
         handleIntent(getIntent());
     }
 
@@ -61,6 +67,8 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
     private void searchForArtist(String query, int limit){
 
+        mTextIntro.setVisibility(View.GONE);
+
         ArtistListFragment fragment = ArtistListFragment.newInstance(query, limit);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
@@ -68,12 +76,13 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     }
 
     @Override
-    public void onArtistSelected(String artistId) {
+    public void onArtistSelected(String artistId, String artistName) {
 //        Toast.makeText(this, artistId, Toast.LENGTH_SHORT).show();
 
         Intent detailIntent = new Intent(this,
                 TrackListActivity.class);
         detailIntent.putExtra(TrackListFragment.ARG_ARTIST_ID, artistId);
+        detailIntent.putExtra(TrackListFragment.ARG_ARTIST, artistName);
         startActivity(detailIntent);
 
     }

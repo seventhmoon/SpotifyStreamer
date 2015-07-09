@@ -1,8 +1,8 @@
 package idv.seventhmoon.spotifystreamer;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +17,11 @@ import android.view.ViewGroup;
  * Use the {@link PlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlayerFragment extends Fragment {
-    private static final String ALBUM_ID = "albumId";
+public class PlayerFragment extends DialogFragment{
 
-    private String mAlbumId;
+
+    private static final String ARG_TRACK_ID = "trackId";
+    private String mTrackId;
 
 
     private OnFragmentInteractionListener mListener;
@@ -29,14 +30,14 @@ public class PlayerFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param albumId albumId.
+     * @param trackId trackId.
      * @return A new instance of fragment PlayerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PlayerFragment newInstance(String albumId) {
+    public static PlayerFragment newInstance(String trackId) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
-        args.putString(ALBUM_ID, albumId);
+        args.putString(ARG_TRACK_ID, trackId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,7 +50,7 @@ public class PlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mAlbumId = getArguments().getString(ALBUM_ID);
+            mTrackId = getArguments().getString(ARG_TRACK_ID);
         }
     }
 

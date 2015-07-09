@@ -18,10 +18,10 @@ public class TrackListActivity extends AppCompatActivity implements TrackListFra
             Bundle arguments = new Bundle();
 
             String artistId =  getIntent().getStringExtra(TrackListFragment.ARG_ARTIST_ID);
-
+            String artistName = getIntent().getStringExtra(TrackListFragment.ARG_ARTIST);
 //            arguments.putString(TrackListFragment.ARG_ARTIST_ID,);
 
-            TrackListFragment fragment = TrackListFragment.newInstance(artistId);
+            TrackListFragment fragment = TrackListFragment.newInstance(artistId, artistName);
 //                    TrackListFragment fragment = new RouteDetailFragment();
 //            fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

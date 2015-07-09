@@ -3,6 +3,8 @@ package idv.seventhmoon.spotifystreamer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -36,7 +38,7 @@ public class TrackListFragment extends Fragment {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_ARTIST_ID = "artistId";
-
+    public static final String ARG_ARTIST = "artist";
 
     private MainApplication mApplication;
     private RecyclerView mRecyclerView;
@@ -44,9 +46,9 @@ public class TrackListFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private TextView mTextViewSearching;
-
+    private TextView mTextViewNoResult;
     private String mArtistId;
-
+    private String mArtist;
 
 
     private OnFragmentInteractionListener mListener;
@@ -60,11 +62,11 @@ public class TrackListFragment extends Fragment {
      * @return A new instance of fragment ArtistListFragment.
      */
 
-    public static TrackListFragment newInstance(String artistId) {
+    public static TrackListFragment newInstance(String artistId, String artistName) {
         TrackListFragment fragment = new TrackListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ARTIST_ID, artistId);
-
+        args.putString(ARG_ARTIST, artistName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,6 +80,7 @@ public class TrackListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mArtistId = getArguments().getString(ARG_ARTIST_ID);
+            mArtist = getArguments().getString(ARG_ARTIST);
 
         }
         mApplication = (MainApplication) getActivity().getApplication();
@@ -90,6 +93,7 @@ public class TrackListFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_track_list, container, false);
         mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
+        mTextViewNoResult =  (TextView) rootView.findViewById(R.id.text_no_result);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -100,6 +104,7 @@ public class TrackListFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(mApplication);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        displaySearching();
         searchForTrack(mArtistId);
 
         return rootView;
@@ -141,13 +146,35 @@ public class TrackListFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        public void onTrackSelected(String trackId);
+        void onTrackSelected(String trackId);
 
+    }
+
+    private void displaySearching(){
+        mTextViewSearching.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        mTextViewNoResult.setVisibility(View.GONE);
     }
 
     private void displayResult(){
         mTextViewSearching.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
+        mTextViewNoResult.setVisibility(View.GONE);
+    }
+
+    private void displayNoResult(){
+        mTextViewSearching.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+        mTextViewNoResult.setVisibility(View.VISIBLE);
+    }
+    private void setActionBarTitle(String title, String subTitle){
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+            actionBar.setSubtitle(subTitle);
+        }
+
+
     }
 
     private void searchForTrack(String artistId){
@@ -158,10 +185,11 @@ public class TrackListFragment extends Fragment {
             public void onResponse(GetArtistsTopTracksResponseModel response) {
 
 //                List<Artist> artists = response.getArtists().getArtists();
+                setActionBarTitle(getString(R.string.text_top_10_tracks), mArtist);
                 List<Track> tracks = response.getTracks();
                 if (tracks.isEmpty()) {
                     //show no result page
-
+                    displayNoResult();
                 } else {
 
                     mAdapter = new TopTracksAdapter(mApplication, tracks, mListener);

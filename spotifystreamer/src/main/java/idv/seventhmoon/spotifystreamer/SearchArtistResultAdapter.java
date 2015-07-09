@@ -78,7 +78,7 @@ public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtist
         holder.mRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onArtistSelected(artist.getId());
+                mListener.onArtistSelected(artist.getId(), artist.getName());
             }
         });
     }
