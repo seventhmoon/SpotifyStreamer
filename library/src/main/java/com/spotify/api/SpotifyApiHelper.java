@@ -4,6 +4,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.spotify.api.model.GetArtistsTopTracksResponseModel;
+import com.spotify.api.model.GetTrackResponseModel;
 import com.spotify.api.model.SearchAlbumResponseModel;
 import com.spotify.api.model.SearchArtistResponseModel;
 import com.spotify.api.network.GsonObjectRequest;
@@ -21,10 +22,13 @@ public class SpotifyApiHelper {
 
     public static final String SEARCH_URL = "https://api.spotify.com/v1/search";
     public static final String GET_TOP_TRACKS_URL = "https://api.spotify.com/v1/artists/%1$s/top-tracks";
+    public static final String GET_TRACK_URL = "https://api.spotify.com/v1/tracks/%1$s";
 
     private RequestQueue mRequestQueue;
+    private String mDefaultCountryCode;
     public SpotifyApiHelper(RequestQueue requestQueue){
         mRequestQueue = requestQueue;
+        mDefaultCountryCode = Locale.getDefault().getCountry();
     }
 
     public Request<SearchArtistResponseModel> searchArtist(String keyword, int limit, Response.Listener<SearchArtistResponseModel> listener, Response.ErrorListener errorListener){
@@ -43,8 +47,21 @@ public class SpotifyApiHelper {
 
     }
 
+
+
     public Request searchArtistsTopTracks(String artistId,  Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener){
-        return searchArtistsTopTracks(artistId, Locale.getDefault().getCountry(), listener, errorListener);
+        return searchArtistsTopTracks(artistId, mDefaultCountryCode, listener, errorListener);
+    }
+
+    public Request requestGetTrack(String trackId, Response.Listener<GetTrackResponseModel> listener, Response.ErrorListener errorListener){
+        String url = String.format(GET_TRACK_URL,trackId);
+
+        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+                url, GetTrackResponseModel.class, null, listener, errorListener);
+
+        // Adding request to request queue
+        return mRequestQueue.add(gsonReq);
+
     }
 
     public Request searchArtistsTopTracks(String artistId, String countryCode, Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener){
