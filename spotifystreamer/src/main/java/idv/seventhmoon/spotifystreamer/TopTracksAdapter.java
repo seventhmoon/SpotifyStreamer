@@ -54,7 +54,7 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
     // Create new views (invoked by the layout manager)
     @Override
     public TopTracksAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+                                                          int viewType) {
         // create a new view
         View rootView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.listitem_track, parent, false);
@@ -81,7 +81,7 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
         holder.mTextViewTrack.setText(track.getName());
 
         List<Image> images = track.getAlbum().getImages();
-        if (!images.isEmpty()){
+        if (!images.isEmpty()) {
             Picasso.with(mContext).load(images.get(0).getUrl()).fit().centerCrop().into(holder.mImageViewThumbnail);
         }
 

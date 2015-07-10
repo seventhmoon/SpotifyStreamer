@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="idv.seventhmoon.spotifystreamer.PlayerFragment">
 
     <TextView
@@ -24,38 +24,53 @@
         android:contentDescription="@string/desc_album_cover"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_current_position"
-        android:layout_below="@+id/image_album_cover"
-        android:layout_alignParentLeft="true"
-        tools:ignore="RtlHardcoded"/>
+        android:id="@+id/text_track_name"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/image_album_cover"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/holder_seek_panel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/text_total_duration"
-        android:layout_below="@+id/image_album_cover"
-        android:layout_alignParentBottom="true"/>
+        android:layout_below="@+id/text_track_name"
+        android:orientation="horizontal">
 
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
-        android:layout_below="@+id/image_album_cover"
-        android:layout_centerHorizontal="true"
-        android:layout_toLeftOf="@id/text_current_position"
-        android:layout_toRightOf="@id/text_total_duration"
-        tools:ignore="RtlHardcoded" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_current_position"
+            android:layout_alignParentLeft="true"
+            tools:ignore="RtlHardcoded"
+            android:text="@string/text_default_duration"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_total_duration"
+            android:layout_alignParentRight="true"
+            android:text="@string/text_default_duration"
+
+            tools:ignore="RtlHardcoded" />
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar"
+            android:layout_toLeftOf="@id/text_current_position"
+            android:layout_toRightOf="@id/text_total_duration"
+            tools:ignore="RtlHardcoded" />
+
+    </RelativeLayout>
+
 
     <ImageButton
         android:src="@drawable/ic_skip_previous_black_24dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/image_perv"
-        android:layout_below="@+id/seekBar"
+        android:layout_below="@+id/holder_seek_panel"
         android:layout_alignParentLeft="true"
         android:contentDescription="@string/desc_perv"
         tools:ignore="RtlHardcoded"/>
@@ -65,7 +80,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/image_play"
-        android:layout_below="@+id/seekBar"
+        android:layout_below="@+id/holder_seek_panel"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/desc_play" />
 
@@ -74,7 +89,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/image_pause"
-        android:layout_below="@+id/seekBar"
+        android:layout_below="@+id/holder_seek_panel"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/desc_pause"
         android:visibility="gone"/>
@@ -84,7 +99,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/image_next"
-        android:layout_below="@+id/seekBar"
+        android:layout_below="@+id/holder_seek_panel"
         android:contentDescription="@string/desc_next"
         android:layout_alignParentRight="true"
         tools:ignore="RtlHardcoded"/>

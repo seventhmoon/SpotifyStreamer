@@ -30,7 +30,6 @@ public class GsonObjectRequest<T> extends JsonRequest<T> {
                              Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url, json, listener, errorListener);
         this.clazz = clazz;
-//        this.headers = headers;
         this.listener = listener;
     }
 

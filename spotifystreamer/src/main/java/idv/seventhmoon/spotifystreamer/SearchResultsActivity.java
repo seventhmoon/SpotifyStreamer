@@ -73,7 +73,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
     }
 
-    private void searchForArtist(String query, int limit){
+    private void searchForArtist(String query, int limit) {
 
 //        SpotifyApiHelper spotifyApiHelper = new SpotifyApiHelper(mApplication.getRequestQueue());
 //        spotifyApiHelper.searchAlbum(query, limit, new Response.Listener<SearchAlbumResponseModel>() {
