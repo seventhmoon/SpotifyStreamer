@@ -35,7 +35,7 @@
             tools:ignore="RtlHardcoded">
 
             <TextView
-                android:id="@+id/text_album"
+                android:id="@+id/text_track"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -43,7 +43,7 @@
                 tools:ignore="RtlHardcoded" />
 
             <TextView
-                android:id="@+id/text_track"
+                android:id="@+id/text_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
