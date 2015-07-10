@@ -1,21 +1,28 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
-    android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="4dp"
-    android:layout_margin="8dp">
+    android:layout_gravity="center"
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="4dp">
 
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_margin="8dp">
+        tools:ignore="UseCompoundDrawables">
 
-    <ImageView android:layout_width="64dp" android:layout_height="64dp"
-        android:id="@+id/image_artist_photo"/>
+        <ImageView
+            android:id="@+id/image_artist_photo"
+            android:layout_width="@dimen/image_thumbnail_width"
+            android:layout_height="@dimen/image_thumbnail_height"
+            android:layout_marginRight="16dp"
+            android:contentDescription="@string/desc_album_cover"
+            tools:ignore="RtlHardcoded" />
 
     <TextView
         android:id="@+id/text_artist_name"

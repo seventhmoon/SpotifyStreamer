@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -53,6 +54,10 @@ public class TrackListFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    public TrackListFragment() {
+        // Required empty public constructor
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -69,10 +74,6 @@ public class TrackListFragment extends Fragment {
         args.putString(ARG_ARTIST, artistName);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public TrackListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -134,23 +135,7 @@ public class TrackListFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-
-        void onTrackSelected(String trackId);
-
-    }
-
-    private void displaySearching(){
+    private void displaySearching() {
         mTextViewSearching.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mTextViewNoResult.setVisibility(View.GONE);
@@ -167,6 +152,7 @@ public class TrackListFragment extends Fragment {
         mRecyclerView.setVisibility(View.GONE);
         mTextViewNoResult.setVisibility(View.VISIBLE);
     }
+
     private void setActionBarTitle(String title, String subTitle){
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
@@ -193,7 +179,7 @@ public class TrackListFragment extends Fragment {
                 } else {
 
                     mAdapter = new TopTracksAdapter(mApplication, tracks, mListener);
-                    Log.d(TAG, tracks.toString());
+//                    Log.d(TAG, tracks.toString());
                     mRecyclerView.setAdapter(mAdapter);
 
                     displayResult();
@@ -205,8 +191,25 @@ public class TrackListFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
+                Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+
+        void onTrackSelected(String trackId);
 
     }
 

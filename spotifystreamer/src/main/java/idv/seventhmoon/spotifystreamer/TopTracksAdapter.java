@@ -2,6 +2,7 @@ package idv.seventhmoon.spotifystreamer;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import java.util.List;
 public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.ViewHolder> {
 
 
+    public static final String TAG = TopTracksAdapter.class.getSimpleName();
+
     private List<Track> mTracks;
     private Context mContext;
     private TrackListFragment.OnFragmentInteractionListener mListener;
@@ -31,25 +34,6 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
         mListener = listener;
 
     }
-
-
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public TextView mTextViewAlbum;
-        public TextView mTextViewTrack;
-        public ImageView mImageViewThumbnail;
-        public View mRootView;
-
-        public ViewHolder(View rootView) {
-            super(rootView);
-
-            mRootView = rootView;
-        }
-    }
-
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -82,7 +66,17 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
 
         List<Image> images = track.getAlbum().getImages();
         if (!images.isEmpty()) {
-            Picasso.with(mContext).load(images.get(0).getUrl()).fit().centerCrop().into(holder.mImageViewThumbnail);
+
+            int width = mContext.getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
+            int height = mContext.getResources().getDimensionPixelSize(R.dimen.image_thumbnail_height);
+
+
+            Image image = ImageUtil.getBestFitImage(images, width, height);
+            String url = image.getUrl();
+
+            Log.d(TAG, image.toString());
+
+            Picasso.with(mContext).load(url).fit().centerCrop().into(holder.mImageViewThumbnail);
         }
 
         holder.mRootView.setOnClickListener(new View.OnClickListener() {
@@ -98,5 +92,22 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
     @Override
     public int getItemCount() {
         return mTracks.size();
+    }
+
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public TextView mTextViewAlbum;
+        public TextView mTextViewTrack;
+        public ImageView mImageViewThumbnail;
+        public View mRootView;
+
+        public ViewHolder(View rootView) {
+            super(rootView);
+
+            mRootView = rootView;
+        }
     }
 }

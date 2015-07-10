@@ -26,4 +26,5 @@
     <string name="text_top_10_tracks">Top 10 Tracks</string>
     <string name="text_default_duration">0:00</string>
     <string name="text_not_implemented">Event is not implemented.</string>
+    <string name="text_network_error">Unknown network error.</string>
 </resources>

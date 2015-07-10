@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -51,6 +52,10 @@ public class ArtistListFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    public ArtistListFragment() {
+        // Required empty public constructor
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -67,10 +72,6 @@ public class ArtistListFragment extends Fragment {
         args.putInt(ARG_SEARCH_LIMIT, searchLimit);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public ArtistListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -130,23 +131,7 @@ public class ArtistListFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-
-        public void onArtistSelected(String artistId, String artistName);
-
-    }
-
-    private void displaySearching(){
+    private void displaySearching() {
         mTextViewSearching.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mTextViewNoResult.setVisibility(View.GONE);
@@ -191,8 +176,25 @@ public class ArtistListFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
+                Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+
+        void onArtistSelected(String artistId, String artistName);
 
     }
 
