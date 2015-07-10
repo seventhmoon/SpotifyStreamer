@@ -16,20 +16,17 @@ public class MainApplication extends Application {
 
     public static final String TAG = MainApplication.class
             .getSimpleName();
-
-    private RequestQueue mRequestQueue;
-//    private ImageLoader mImageLoader;
-
     private static MainApplication mInstance;
+    private RequestQueue mRequestQueue;
+
+    public static synchronized MainApplication getInstance() {
+        return mInstance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-    }
-
-    public static synchronized MainApplication getInstance() {
-        return mInstance;
     }
 
     public RequestQueue getRequestQueue() {
@@ -39,15 +36,6 @@ public class MainApplication extends Application {
 
         return mRequestQueue;
     }
-
-//    public ImageLoader getImageLoader() {
-//        getRequestQueue();
-//        if (mImageLoader == null) {
-//            mImageLoader = new ImageLoader(this.mRequestQueue,
-//                    new LruBitmapCache());
-//        }
-//        return this.mImageLoader;
-//    }
 
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         // set the default tag if tag is empty

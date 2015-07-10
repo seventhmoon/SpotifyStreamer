@@ -23,6 +23,7 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SearchView mSearchView;
 
     private TextView mTextIntro;
 
@@ -43,9 +44,10 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
         inflater.inflate(R.menu.menu_main, menu);
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        mSearchView =
                 (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        searchView.setSearchableInfo(
+
+        mSearchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
         return true;
@@ -65,7 +67,7 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
         }
     }
 
-    private void searchForArtist(String query, int limit){
+    private void searchForArtist(String query, int limit) {
 
         mTextIntro.setVisibility(View.GONE);
 
@@ -84,6 +86,12 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
         detailIntent.putExtra(TrackListFragment.ARG_ARTIST_ID, artistId);
         detailIntent.putExtra(TrackListFragment.ARG_ARTIST, artistName);
         startActivity(detailIntent);
+
+    }
+
+    @Override
+    public void onSearchReturnNoResult() {
+        mSearchView.setIconified(true);
 
     }
 }

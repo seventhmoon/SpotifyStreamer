@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
+ * Adapter for building up the RecyclerView for displar
  * Created by fung on 05/07/2015.
  */
 public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.ViewHolder> {
@@ -57,7 +58,7 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-//        holder.mTextView.setText(mDataset[position]);
+
 
         final Track track = mTracks.get(position);
         holder.mTextViewAlbum.setText(track.getAlbum().getName());
@@ -73,8 +74,10 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
             Image image = ImageUtil.getBestFitImage(images, width, height);
             String url = image.getUrl();
 
-
-            Picasso.with(mContext).load(url).fit().centerCrop().into(holder.mImageViewThumbnail);
+            try {
+                Picasso.with(mContext).load(url).fit().centerCrop().into(holder.mImageViewThumbnail);
+            } catch (IllegalArgumentException ex) {
+            }
         }
 
         holder.mRootView.setOnClickListener(new View.OnClickListener() {

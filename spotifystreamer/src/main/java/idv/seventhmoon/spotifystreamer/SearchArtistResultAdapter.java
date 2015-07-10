@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
+ * Adapter for building up the RecyclerView for display
  * Created by fung on 05/07/2015.
  */
 public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtistResultAdapter.ViewHolder> {
@@ -63,8 +64,10 @@ public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtist
 
 
             Image image = ImageUtil.getBestFitImage(images, width, height);
-
-            Picasso.with(mContext).load(image.getUrl()).fit().centerCrop().into(holder.mImageArtistPhoto);
+            try {
+                Picasso.with(mContext).load(image.getUrl()).fit().centerCrop().into(holder.mImageArtistPhoto);
+            } catch (IllegalArgumentException ex) {
+            }
         }
 
         holder.mRootView.setOnClickListener(new View.OnClickListener() {

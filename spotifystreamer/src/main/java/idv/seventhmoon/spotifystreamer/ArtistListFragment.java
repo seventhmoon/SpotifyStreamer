@@ -147,6 +147,7 @@ public class ArtistListFragment extends Fragment {
         mTextViewSearching.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
         mTextViewNoResult.setVisibility(View.VISIBLE);
+        mListener.onSearchReturnNoResult();
     }
 
     private void searchForArtist(String query, int limit){
@@ -196,6 +197,7 @@ public class ArtistListFragment extends Fragment {
 
         void onArtistSelected(String artistId, String artistName);
 
+        void onSearchReturnNoResult();
     }
 
 }

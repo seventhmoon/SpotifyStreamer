@@ -170,7 +170,7 @@ public class TrackListFragment extends Fragment {
             @Override
             public void onResponse(GetArtistsTopTracksResponseModel response) {
 
-//                List<Artist> artists = response.getArtists().getArtists();
+
                 setActionBarTitle(getString(R.string.text_top_10_tracks), mArtist);
                 List<Track> tracks = response.getTracks();
                 if (tracks.isEmpty()) {
@@ -210,6 +210,7 @@ public class TrackListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
 
         void onTrackSelected(String trackId);
+
 
     }
 
