@@ -2,7 +2,6 @@ package idv.seventhmoon.spotifystreamer;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +73,6 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
             Image image = ImageUtil.getBestFitImage(images, width, height);
             String url = image.getUrl();
 
-            Log.d(TAG, image.toString());
 
             Picasso.with(mContext).load(url).fit().centerCrop().into(holder.mImageViewThumbnail);
         }

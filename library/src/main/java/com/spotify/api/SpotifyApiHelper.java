@@ -32,7 +32,19 @@ public class SpotifyApiHelper {
         mDefaultCountryCode = Locale.getDefault().getCountry();
     }
 
-    public Request<SearchArtistResponseModel> searchArtist(String keyword, int limit, Response.Listener<SearchArtistResponseModel> listener, Response.ErrorListener errorListener) {
+    private static String toUrlParams(Map<String, String> params) {
+        StringBuffer sb = new StringBuffer();
+        for (String key : params.keySet()) {
+            try {
+                sb.append("&" + key + "=" + URLEncoder.encode(params.get(key), "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString().substring(1);
+    }
+
+    public Request searchArtist(String keyword, int limit, Response.Listener<SearchArtistResponseModel> listener, Response.ErrorListener errorListener) {
         TreeMap<String, String> params = new TreeMap<>();
         params.put("type", "artist");
         params.put("limit", Integer.toString(limit));
@@ -47,7 +59,6 @@ public class SpotifyApiHelper {
         return mRequestQueue.add(gsonReq);
 
     }
-
 
     public Request searchArtistsTopTracks(String artistId, Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener) {
         return searchArtistsTopTracks(artistId, mDefaultCountryCode, listener, errorListener);
@@ -93,19 +104,6 @@ public class SpotifyApiHelper {
         // Adding request to request queue
         return mRequestQueue.add(gsonReq);
 
-    }
-
-
-    private static String toUrlParams(Map<String, String> params) {
-        StringBuffer sb = new StringBuffer();
-        for (String key : params.keySet()) {
-            try {
-                sb.append("&" + key + "=" + URLEncoder.encode(params.get(key), "utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString().substring(1);
     }
 
 }
