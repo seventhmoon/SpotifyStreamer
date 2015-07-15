@@ -43,8 +43,7 @@ public class ArtistListFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private TextView mTextViewSearching;
-    private TextView mTextViewNoResult;
+    private TextView mTextMessage;
 
     private String mSearchKeyword;
     private int mSearchLimit;
@@ -90,8 +89,9 @@ public class ArtistListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_artist_list, container, false);
-        mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
-        mTextViewNoResult = (TextView) rootView.findViewById(R.id.text_no_result);
+
+
+        mTextMessage = (TextView) rootView.findViewById(R.id.text_message);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -102,8 +102,11 @@ public class ArtistListFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(mApplication);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        searchForArtist(mSearchKeyword, mSearchLimit);
-
+        if (mSearchKeyword != null) {
+            searchForArtist(mSearchKeyword, mSearchLimit);
+        }else{
+            displayStartUpHint();
+        }
         return rootView;
     }
 
@@ -131,22 +134,35 @@ public class ArtistListFragment extends Fragment {
         mListener = null;
     }
 
-    private void displaySearching() {
-        mTextViewSearching.setVisibility(View.VISIBLE);
+    private void displayStartUpHint() {
+        mTextMessage.setText(R.string.text_intro_search);
+        mTextMessage.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mTextViewNoResult.setVisibility(View.GONE);
+
+    }
+
+    private void displaySearching() {
+        mTextMessage.setText(R.string.text_searching);
+        mTextMessage.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+
     }
 
     private void displayResult(){
-        mTextViewSearching.setVisibility(View.GONE);
+        mTextMessage.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
-        mTextViewNoResult.setVisibility(View.GONE);
+    }
+
+    private void displayError(){
+        mTextMessage.setText(R.string.text_network_error);
+        mTextMessage.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
     }
 
     private void displayNoResult(){
-        mTextViewSearching.setVisibility(View.GONE);
+        mTextMessage.setText(R.string.text_no_result);
+        mTextMessage.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mTextViewNoResult.setVisibility(View.VISIBLE);
         mListener.onSearchReturnNoResult();
     }
 

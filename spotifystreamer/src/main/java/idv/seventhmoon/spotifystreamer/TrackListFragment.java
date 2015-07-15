@@ -46,8 +46,9 @@ public class TrackListFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private TextView mTextViewSearching;
-    private TextView mTextViewNoResult;
+//    private TextView mTextViewSearching;
+//    private TextView mTextViewNoResult;
+    private TextView mTextViewMessage;
     private String mArtistId;
     private String mArtist;
 
@@ -93,8 +94,9 @@ public class TrackListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_track_list, container, false);
-        mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
-        mTextViewNoResult =  (TextView) rootView.findViewById(R.id.text_no_result);
+//        mTextViewSearching = (TextView) rootView.findViewById(R.id.text_searching);
+//        mTextViewNoResult =  (TextView) rootView.findViewById(R.id.text_no_result);
+        mTextViewMessage = (TextView) rootView.findViewById(R.id.text_message);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -136,21 +138,24 @@ public class TrackListFragment extends Fragment {
     }
 
     private void displaySearching() {
-        mTextViewSearching.setVisibility(View.VISIBLE);
+        mTextViewMessage.setText(R.string.text_searching);
+        mTextViewMessage.setVisibility(View.VISIBLE);
+//        mTextViewSearching.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mTextViewNoResult.setVisibility(View.GONE);
+//        mTextViewNoResult.setVisibility(View.GONE);
     }
 
     private void displayResult(){
-        mTextViewSearching.setVisibility(View.GONE);
+        mTextViewMessage.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
-        mTextViewNoResult.setVisibility(View.GONE);
+//        mTextViewNoResult.setVisibility(View.GONE);
     }
 
     private void displayNoResult(){
-        mTextViewSearching.setVisibility(View.GONE);
+//        mTextViewSearching.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
-        mTextViewNoResult.setVisibility(View.VISIBLE);
+        mTextViewMessage.setText(R.string.text_no_result);
+        mTextViewMessage.setVisibility(View.VISIBLE);
     }
 
     private void setActionBarTitle(String title, String subTitle){

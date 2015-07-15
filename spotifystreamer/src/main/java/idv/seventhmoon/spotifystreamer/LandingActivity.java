@@ -11,11 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.TextView;
 
 
-public class LandingActivity extends AppCompatActivity implements ArtistListFragment.OnFragmentInteractionListener {
+public class LandingActivity extends AppCompatActivity implements ArtistListFragment.OnFragmentInteractionListener, TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener {
 
     public static final String TAG = LandingActivity.class.getSimpleName();
 
@@ -24,8 +22,9 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SearchView mSearchView;
+//    private TextView mTextIntro;
 
-    private TextView mTextIntro;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +32,24 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
         setContentView(R.layout.activity_landing);
 
-        mTextIntro = (TextView) findViewById(R.id.text_intro);
+//        mTextIntro = (TextView) findViewById(R.id.text_intro);
+
+
+        mTwoPane = (findViewById(R.id.view_right_pane) != null);
+
+//        if (findViewById(R.id.view_right_pane) != null){
+//            mTwoPane = true;
+//
+//        }else{
+//            mTwoPane = false;
+//
+//        }
+
+        ArtistListFragment fragment = new ArtistListFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.view_left_pane, fragment);
+        fragmentTransaction.commit();
+
 
         handleIntent(getIntent());
     }
@@ -69,11 +85,11 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
     private void searchForArtist(String query, int limit) {
 
-        mTextIntro.setVisibility(View.GONE);
+//        mTextIntro.setVisibility(View.GONE);
 
         ArtistListFragment fragment = ArtistListFragment.newInstance(query, limit);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
+        fragmentTransaction.replace(R.id.view_left_pane, fragment);
         fragmentTransaction.commit();
     }
 
@@ -81,11 +97,22 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     public void onArtistSelected(String artistId, String artistName) {
 //        Toast.makeText(this, artistId, Toast.LENGTH_SHORT).show();
 
-        Intent detailIntent = new Intent(this,
-                TrackListActivity.class);
-        detailIntent.putExtra(TrackListFragment.ARG_ARTIST_ID, artistId);
-        detailIntent.putExtra(TrackListFragment.ARG_ARTIST, artistName);
-        startActivity(detailIntent);
+        if (mTwoPane){
+
+            TrackListFragment fragment = TrackListFragment.newInstance(artistId, artistName);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.view_right_pane, fragment);
+            fragmentTransaction.commit();
+
+        }else{
+
+            Intent detailIntent = new Intent(this,
+                    TrackListActivity.class);
+            detailIntent.putExtra(TrackListFragment.ARG_ARTIST_ID, artistId);
+            detailIntent.putExtra(TrackListFragment.ARG_ARTIST, artistName);
+            startActivity(detailIntent);
+        }
+
 
     }
 
@@ -93,5 +120,11 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     public void onSearchReturnNoResult() {
         mSearchView.setIconified(true);
 
+    }
+
+    @Override
+    public void onTrackSelected(String trackId) {
+        PlayerFragment fragment = PlayerFragment.newInstance(trackId);
+        fragment.show(getSupportFragmentManager(), TAG);
     }
 }

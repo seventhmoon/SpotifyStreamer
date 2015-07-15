@@ -7,7 +7,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 
-public class TrackListActivity extends AppCompatActivity implements TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener {
+public class TrackListActivity extends AppCompatActivity implements TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
