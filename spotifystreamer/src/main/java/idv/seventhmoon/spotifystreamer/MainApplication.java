@@ -4,18 +4,28 @@ package idv.seventhmoon.spotifystreamer;
  */
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.spotify.api.model.Track;
 
-import java.util.Locale;
+import java.util.List;
+
+import idv.seventhmoon.spotifystreamer.activity.SettingsActivity;
 
 public class MainApplication extends Application {
 
+
+
     public static final String TAG = MainApplication.class
             .getSimpleName();
+    private final String DEFAULT_LOCALE = "HK";
+    private final boolean DEFAULT_NOTIFICATION_ENABLED = true;
+
     private static MainApplication mInstance;
     private RequestQueue mRequestQueue;
 
@@ -55,6 +65,24 @@ public class MainApplication extends Application {
     }
 
     public String getCountryCode(){
-        return Locale.getDefault().getCountry();
+//        return Locale.getDefault().getCountry();
+        return getLocalePref();
+    }
+
+    private String getLocalePref(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String localePref = sharedPref.getString(SettingsActivity.KEY_PREF_LOCALE, DEFAULT_LOCALE);
+        return localePref;
+    }
+
+    private boolean getNotificationPref(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean notiPref = sharedPref.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION, DEFAULT_NOTIFICATION_ENABLED);
+        return notiPref;
+    }
+
+    private void saveTracksInfo(List<Track>tracks, int trackPosition){
+
+
     }
 }

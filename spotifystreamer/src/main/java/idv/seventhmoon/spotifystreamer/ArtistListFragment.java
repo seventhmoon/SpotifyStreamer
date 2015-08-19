@@ -1,6 +1,6 @@
 package idv.seventhmoon.spotifystreamer;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,6 +47,7 @@ public class ArtistListFragment extends Fragment {
 
     private String mSearchKeyword;
     private int mSearchLimit;
+    private String mPreferredMarket;
 
 
     private OnFragmentInteractionListener mListener;
@@ -81,7 +82,7 @@ public class ArtistListFragment extends Fragment {
             mSearchLimit = getArguments().getInt(ARG_SEARCH_LIMIT);
         }
         mApplication = (MainApplication) getActivity().getApplication();
-
+        mPreferredMarket = mApplication.getCountryCode();
     }
 
     @Override
@@ -103,7 +104,7 @@ public class ArtistListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         if (mSearchKeyword != null) {
-            searchForArtist(mSearchKeyword, mSearchLimit);
+            searchForArtist(mSearchKeyword, mPreferredMarket,  mSearchLimit);
         }else{
             displayStartUpHint();
         }
@@ -118,12 +119,12 @@ public class ArtistListFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -166,11 +167,11 @@ public class ArtistListFragment extends Fragment {
         mListener.onSearchReturnNoResult();
     }
 
-    private void searchForArtist(String query, int limit){
+    private void searchForArtist(String query, String market, int limit){
         displaySearching();
 
         SpotifyApiHelper spotifyApiHelper = new SpotifyApiHelper(mApplication.getRequestQueue());
-        spotifyApiHelper.searchArtist(query, limit, new Response.Listener<SearchArtistResponseModel>() {
+        spotifyApiHelper.searchArtist(query, market, limit, new Response.Listener<SearchArtistResponseModel>() {
             @Override
             public void onResponse(SearchArtistResponseModel response) {
 
@@ -181,7 +182,7 @@ public class ArtistListFragment extends Fragment {
                 } else {
 
                     mAdapter = new SearchArtistResultAdapter(mApplication, artists, mListener);
-                                  Log.d(TAG,artists.toString());
+//                                  Log.d(TAG,artists.toString());
                     mRecyclerView.setAdapter(mAdapter);
 
                     displayResult();
@@ -193,7 +194,12 @@ public class ArtistListFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
-                Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
+                if (error.networkResponse.statusCode == 400){
+                    Toast.makeText(getActivity(), getString(R.string.text_network_bad_request), Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

@@ -1,9 +1,13 @@
-package idv.seventhmoon.spotifystreamer;
+package idv.seventhmoon.spotifystreamer.activity;
 
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.browse.MediaBrowser;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -11,17 +15,46 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+
+import com.google.gson.Gson;
+import com.spotify.api.model.Track;
+
+import java.util.List;
+
+import idv.seventhmoon.spotifystreamer.ArtistListFragment;
+import idv.seventhmoon.spotifystreamer.MainApplication;
+import idv.seventhmoon.spotifystreamer.PlayerFragment;
+import idv.seventhmoon.spotifystreamer.R;
+import idv.seventhmoon.spotifystreamer.TrackListActivity;
+import idv.seventhmoon.spotifystreamer.TrackListFragment;
 
 
-public class LandingActivity extends AppCompatActivity implements ArtistListFragment.OnFragmentInteractionListener, TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener {
+public class LandingActivity extends AppCompatActivity
+        implements ArtistListFragment.OnFragmentInteractionListener,
+        TrackListFragment.OnFragmentInteractionListener,
+        PlayerFragment.OnFragmentInteractionListener {
 
     public static final String TAG = LandingActivity.class.getSimpleName();
+    private static final int RESULT_SETTINGS = 1;
+
+    public static final String ARG_TRACKS = "tracks";
+    public static final String ARG_TRACK_POSITION = "track_position";
+    private static final String ARG_MEDIA_SESSION = "SpotifyStreamer";
+
+    private MediaSession mMediaSession;
 
     private MainApplication mApplication;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SearchView mSearchView;
+
+    private MediaBrowser mMediaBrowser;
+
+
+
+
 //    private TextView mTextIntro;
 
     private boolean mTwoPane;
@@ -52,6 +85,10 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
 
         handleIntent(getIntent());
+
+        mMediaSession = new MediaSession(this, TAG);
+
+
     }
 
     @Override
@@ -68,6 +105,7 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
 
         return true;
     }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -97,14 +135,14 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     public void onArtistSelected(String artistId, String artistName) {
 //        Toast.makeText(this, artistId, Toast.LENGTH_SHORT).show();
 
-        if (mTwoPane){
+        if (mTwoPane) {
 
             TrackListFragment fragment = TrackListFragment.newInstance(artistId, artistName);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.view_right_pane, fragment);
             fragmentTransaction.commit();
 
-        }else{
+        } else {
 
             Intent detailIntent = new Intent(this,
                     TrackListActivity.class);
@@ -123,8 +161,68 @@ public class LandingActivity extends AppCompatActivity implements ArtistListFrag
     }
 
     @Override
-    public void onTrackSelected(String trackId) {
-        PlayerFragment fragment = PlayerFragment.newInstance(trackId);
+    public void onTrackSelected(List<Track> tracks, int trackPosition) {
+        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackPosition);
         fragment.show(getSupportFragmentManager(), TAG);
     }
+
+
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.settings:
+                Intent detailIntent = new Intent(this,
+                        SettingsActivity.class);
+
+//                startActivity(detailIntent);
+                startActivityForResult(detailIntent, RESULT_SETTINGS);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+
+    }
+
+
+
+    public void onPauseButtonPressed() {
+
+    }
+
+    public void onNextButtonPressed() {
+
+    }
+
+    public void onPervButtonPressed() {
+
+    }
+
+    public void onPlayButtonPressed() {
+
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void saveTracks(List<Track> tracks) {
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean("silentMode", mSilentMode);
+        editor.putString(ARG_TRACKS, new Gson().toJson(tracks));
+        // Commit the edits!
+        editor.commit();
+    }
+
+    public void saveTrackPosition(int trackPosition) {
+
+
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean("silentMode", mSilentMode);
+        editor.putInt(ARG_TRACK_POSITION, trackPosition);
+        // Commit the edits!
+        editor.commit();
+    }
+
 }

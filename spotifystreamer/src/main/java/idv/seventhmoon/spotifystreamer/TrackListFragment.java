@@ -1,6 +1,6 @@
 package idv.seventhmoon.spotifystreamer;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -41,6 +41,7 @@ public class TrackListFragment extends Fragment {
     public static final String ARG_ARTIST_ID = "artistId";
     public static final String ARG_ARTIST = "artist";
 
+    private String mCountryCode;
     private MainApplication mApplication;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -86,7 +87,7 @@ public class TrackListFragment extends Fragment {
 
         }
         mApplication = (MainApplication) getActivity().getApplication();
-
+        mCountryCode = mApplication.getCountryCode();
     }
 
     @Override
@@ -113,20 +114,20 @@ public class TrackListFragment extends Fragment {
         return rootView;
     }
 
-    public void onTrackSelected(String trackId){
-        if (mListener != null) {
-            mListener.onTrackSelected(trackId);
-        }
-    }
+//    public void onTrackSelected(String trackId){
+//        if (mListener != null) {
+//            mListener.onTrackSelected(trackId);
+//        }
+//    }
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -171,7 +172,7 @@ public class TrackListFragment extends Fragment {
     private void searchForTrack(String artistId){
 
         SpotifyApiHelper spotifyApiHelper = new SpotifyApiHelper(mApplication.getRequestQueue());
-        spotifyApiHelper.searchArtistsTopTracks(artistId, new Response.Listener<GetArtistsTopTracksResponseModel>() {
+        spotifyApiHelper.searchArtistsTopTracks(artistId, mCountryCode, new Response.Listener<GetArtistsTopTracksResponseModel>() {
             @Override
             public void onResponse(GetArtistsTopTracksResponseModel response) {
 
@@ -196,7 +197,12 @@ public class TrackListFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
-                Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
+
+                if (error.networkResponse.statusCode == 400){
+                    Toast.makeText(getActivity(), getString(R.string.text_network_bad_request), Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getActivity(), getString(R.string.text_network_error), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -214,7 +220,7 @@ public class TrackListFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
-        void onTrackSelected(String trackId);
+        void onTrackSelected(List<Track> tracks, int trackNumber);
 
 
     }

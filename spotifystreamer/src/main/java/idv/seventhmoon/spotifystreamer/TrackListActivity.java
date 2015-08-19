@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import com.spotify.api.model.Track;
+
+import java.util.List;
 
 
 public class TrackListActivity extends AppCompatActivity implements TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener{
@@ -15,7 +18,7 @@ public class TrackListActivity extends AppCompatActivity implements TrackListFra
         setContentView(R.layout.activity_tracks_list);
 
         if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
+//            Bundle arguments = new Bundle();
 
             String artistId = getIntent().getStringExtra(TrackListFragment.ARG_ARTIST_ID);
             String artistName = getIntent().getStringExtra(TrackListFragment.ARG_ARTIST);
@@ -47,16 +50,17 @@ public class TrackListActivity extends AppCompatActivity implements TrackListFra
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onTrackSelected(String trackId) {
-        Toast.makeText(this, getString(R.string.text_not_implemented), Toast.LENGTH_SHORT).show();
 
+
+    @Override
+    public void onTrackSelected(List<Track> tracks, int trackNumber) {
+//        Toast.makeText(this, getString(R.string.text_not_implemented), Toast.LENGTH_SHORT).show();
 
         //for phase 2
-//        PlayerFragment fragment = PlayerFragment.newInstance(trackId);
-//        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
-//        fragmentTransaction.commit();
+        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackNumber);
+        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
+        fragmentTransaction.commit();
 //        fragment.show(getSupportFragmentManager(), fragment.getClass().getSimpleName());
     }
 }

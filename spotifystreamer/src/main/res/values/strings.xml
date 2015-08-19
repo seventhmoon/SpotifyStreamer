@@ -25,4 +25,8 @@
     <string name="text_default_duration">0:00</string>
     <string name="text_not_implemented">Event is not implemented.</string>
     <string name="text_network_error">Unknown network error.</string>
+    <string name="text_network_bad_request">Network Error - Bad Request.</string>
+    <string name="key_locale">pref_locale</string>
+    <string name="key_notification">pref_notification</string>
+
 </resources>

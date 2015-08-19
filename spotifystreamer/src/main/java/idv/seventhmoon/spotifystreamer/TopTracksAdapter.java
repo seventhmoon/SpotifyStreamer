@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.spotify.api.model.Image;
 import com.spotify.api.model.Track;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
@@ -75,15 +75,17 @@ public class TopTracksAdapter extends RecyclerView.Adapter<TopTracksAdapter.View
             String url = image.getUrl();
 
             try {
-                Picasso.with(mContext).load(url).fit().centerCrop().into(holder.mImageViewThumbnail);
+                Glide.with(mContext).load(url).centerCrop().into(holder.mImageViewThumbnail);
             } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
             }
         }
 
         holder.mRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onTrackSelected(track.getId());
+//                mListener.onTrackSelected(track.getId());
+                mListener.onTrackSelected(mTracks, position);
             }
         });
 

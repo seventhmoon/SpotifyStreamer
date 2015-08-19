@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.spotify.api.model.Artist;
 import com.spotify.api.model.Image;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -65,8 +65,9 @@ public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtist
 
             Image image = ImageUtil.getBestFitImage(images, width, height);
             try {
-                Picasso.with(mContext).load(image.getUrl()).fit().centerCrop().into(holder.mImageArtistPhoto);
+                Glide.with(mContext).load(image.getUrl()).centerCrop().into(holder.mImageArtistPhoto);
             } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -74,8 +75,11 @@ public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtist
             @Override
             public void onClick(View v) {
                 mListener.onArtistSelected(artist.getId(), artist.getName());
+
             }
         });
+
+//        holder.mRootView.setSelected(mS);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -96,6 +100,7 @@ public class SearchArtistResultAdapter extends RecyclerView.Adapter<SearchArtist
         public ViewHolder(View rootView) {
             super(rootView);
             mRootView = rootView;
+            rootView.setClickable(true);
         }
     }
 }
