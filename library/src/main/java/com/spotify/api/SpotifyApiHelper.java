@@ -11,7 +11,7 @@ import com.spotify.api.network.GsonObjectRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -20,17 +20,22 @@ import java.util.TreeMap;
  */
 public class SpotifyApiHelper {
 
-    public static final String SEARCH_URL = "https://api.spotify.com/v1/search";
-    public static final String GET_TOP_TRACKS_URL = "https://api.spotify.com/v1/artists/%1$s/top-tracks";
+    public static final String TAG = SpotifyApiHelper.class.getSimpleName();
+
+    public static final String SEARCH_ITEM_URL = "https://api.spotify.com/v1/search";
+    public static final String GET_ARTISTS_TOP_TRACKS_URL = "https://api.spotify.com/v1/artists/%1$s/top-tracks";
     public static final String GET_TRACK_URL = "https://api.spotify.com/v1/tracks/%1$s";
+    public static final String GET_SEVERAL_TRACKS_URL = "https://api.spotify.com/v1/tracks/";
 
     private RequestQueue mRequestQueue;
-    private String mDefaultCountryCode;
+//    private String mCountryCode;
 
     public SpotifyApiHelper(RequestQueue requestQueue) {
         mRequestQueue = requestQueue;
-        mDefaultCountryCode = Locale.getDefault().getCountry();
+//        mCountryCode = Locale.getDefault().getCountry();
     }
+
+
 
     private static String toUrlParams(Map<String, String> params) {
         StringBuffer sb = new StringBuffer();
@@ -44,15 +49,16 @@ public class SpotifyApiHelper {
         return sb.toString().substring(1);
     }
 
-    public Request searchArtist(String keyword, int limit, Response.Listener<SearchArtistResponseModel> listener, Response.ErrorListener errorListener) {
+    public Request searchArtist(String keyword, String market, int limit, Response.Listener<SearchArtistResponseModel> listener, Response.ErrorListener errorListener) {
         TreeMap<String, String> params = new TreeMap<>();
         params.put("type", "artist");
         params.put("limit", Integer.toString(limit));
+        params.put("market", market);
         params.put("q", keyword);
 
-        String url = SEARCH_URL + "?" + toUrlParams(params);
+        String url = SEARCH_ITEM_URL + "?" + toUrlParams(params);
 
-        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+        GsonObjectRequest gsonReq = new GsonObjectRequest<>(Request.Method.GET,
                 url, SearchArtistResponseModel.class, null, listener, errorListener);
 
         // Adding request to request queue
@@ -60,14 +66,38 @@ public class SpotifyApiHelper {
 
     }
 
-    public Request searchArtistsTopTracks(String artistId, Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener) {
-        return searchArtistsTopTracks(artistId, mDefaultCountryCode, listener, errorListener);
+//    public Request searchArtistsTopTracks(String artistId, Response.Listener<GetArtistsTopTracksResponseModel> listener, Response.ErrorListener errorListener) {
+//        return searchArtistsTopTracks(artistId, mDefaultCountryCode, listener, errorListener);
+//    }
+
+
+    public Request requestGetSeveralTracks(List<String> trackIds, Response.Listener<GetTrackResponseModel> listener, Response.ErrorListener errorListener) {
+
+        StringBuilder sb = new StringBuilder();
+        for(String trackId : trackIds){
+            sb.append(trackId + ",");
+        }
+
+
+                TreeMap<String, String> params = new TreeMap<>();
+        String ids = sb.toString();
+        ids = ids.substring(0, ids.length() -2);
+        params.put("ids", ids);
+
+        String url = GET_SEVERAL_TRACKS_URL + "?" + toUrlParams(params);
+
+        GsonObjectRequest gsonReq = new GsonObjectRequest<>(Request.Method.GET,
+                url, GetTrackResponseModel.class, null, listener, errorListener);
+
+        // Adding request to request queue
+        return mRequestQueue.add(gsonReq);
+
     }
 
     public Request requestGetTrack(String trackId, Response.Listener<GetTrackResponseModel> listener, Response.ErrorListener errorListener) {
         String url = String.format(GET_TRACK_URL, trackId);
 
-        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+        GsonObjectRequest gsonReq = new GsonObjectRequest<>(Request.Method.GET,
                 url, GetTrackResponseModel.class, null, listener, errorListener);
 
         // Adding request to request queue
@@ -80,10 +110,12 @@ public class SpotifyApiHelper {
 
         params.put("country", countryCode);
 
-        String url = String.format(GET_TOP_TRACKS_URL, artistId) + "?" + toUrlParams(params);
+        String url = String.format(GET_ARTISTS_TOP_TRACKS_URL, artistId) + "?" + toUrlParams(params);
 
-        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+        GsonObjectRequest gsonReq = new GsonObjectRequest<>(Request.Method.GET,
                 url, GetArtistsTopTracksResponseModel.class, null, listener, errorListener);
+
+//        Log.d(TAG, gsonReq.toString());
 
         // Adding request to request queue
         return mRequestQueue.add(gsonReq);
@@ -96,9 +128,9 @@ public class SpotifyApiHelper {
         params.put("limit", Integer.toString(limit));
         params.put("q", keyword);
 
-        String url = SEARCH_URL + "?" + toUrlParams(params);
+        String url = SEARCH_ITEM_URL + "?" + toUrlParams(params);
 
-        GsonObjectRequest gsonReq = new GsonObjectRequest(Request.Method.GET,
+        GsonObjectRequest gsonReq = new GsonObjectRequest<>(Request.Method.GET,
                 url, SearchAlbumResponseModel.class, null, listener, errorListener);
 
         // Adding request to request queue
