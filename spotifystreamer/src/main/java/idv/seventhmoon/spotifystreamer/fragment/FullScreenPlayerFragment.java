@@ -260,7 +260,7 @@ public class FullScreenPlayerFragment extends DialogFragment implements
         if (mMusicService == null) return null;
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
                 getString(R.string.app_name) + " - " +
@@ -333,7 +333,7 @@ public class FullScreenPlayerFragment extends DialogFragment implements
         if (mPlayIntent == null) {
             Activity activity = getActivity();
             mPlayIntent = new Intent(activity, MediaPlayerService.class);
-            activity.bindService(mPlayIntent, streamingConnection, activity.BIND_AUTO_CREATE);
+            activity.bindService(mPlayIntent, streamingConnection, Activity.BIND_AUTO_CREATE);
         }
     }
 
@@ -352,7 +352,7 @@ public class FullScreenPlayerFragment extends DialogFragment implements
             mLine2.setText(track.getPrintableArtists());
             fetchImageAsync(track);
 
-            int duration = (int) track.getDuration();
+            int duration = track.getPreviewDuration();
             mSeekbar.setMax(duration);
             mEnd.setText(formatMillis(duration));
 
@@ -387,12 +387,7 @@ public class FullScreenPlayerFragment extends DialogFragment implements
                         @Override
                         public void onGlobalLayout() {
                             loadImage(track);
-
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                                mAlbumImage.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                            } else {
-                                mAlbumImage.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                            }
+                            mAlbumImage.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         }
                     });
         } else {

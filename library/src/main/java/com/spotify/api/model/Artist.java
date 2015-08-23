@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by fung on 05/07/2015.
  */
-public class Artist {
+public class Artist{
 
     @SerializedName("external_urls")
     private ExternalUrls externalUrls;
@@ -38,6 +38,8 @@ public class Artist {
     private String type;
     @SerializedName("uri")
     private String uri;
+
+
 
     public ExternalUrls getExternalUrls() {
         return externalUrls;
@@ -110,4 +112,8 @@ public class Artist {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+
+
+
 }

@@ -14,13 +14,14 @@ import idv.seventhmoon.spotifystreamer.fragment.FullScreenPlayerFragment;
  */
 
 public class FullScreenPlayerActivity extends BaseActivity {
-    public static final String PLAYER_SESSION = "us.phyxsi.spotifystreamer.PLAYER_SESSION";
+    public static final String PLAYER_SESSION = "PLAYER_SESSION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        //not implemented yet
 //            initializeToolbar(R.menu.menu_player);
 
         if (savedInstanceState == null) {

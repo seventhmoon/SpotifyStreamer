@@ -9,6 +9,8 @@ import java.util.List;
  */
 public class Track {
 
+    private final int PREVIEW_DURAION = 30000;
+
     @SerializedName("album")
     private Album album;
     @SerializedName("artists")
@@ -76,6 +78,10 @@ public class Track {
 
     public long getDuration() {
         return duration;
+    }
+
+    public int getPreviewDuration(){
+        return PREVIEW_DURAION;
     }
 
     public void setDuration(long duration) {
@@ -168,5 +174,13 @@ public class Track {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getPrintableArtists(){
+        StringBuilder sb = new StringBuilder();
+        for (Artist artist : artists){
+            sb.append(artist.getName() + ", ");
+        }
+        return sb.toString().substring(0, sb.length()-2);
     }
 }

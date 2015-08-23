@@ -32,7 +32,7 @@ import idv.seventhmoon.spotifystreamer.activity.FullScreenPlayerActivity;
 import idv.seventhmoon.spotifystreamer.service.MediaPlayerService;
 
 /**
- * Created by fung on 23/08/2015.
+ * PlaybackControlsFragment locate at the bottom of the application
  */
 public class PlaybackControlsFragment extends Fragment implements
         MediaPlayerService.MusicServiceCallback, MediaPlayerService.OnStateChangeListener {
@@ -112,8 +112,6 @@ public class PlaybackControlsFragment extends Fragment implements
                 }
             }
         });
-
-//        setViewsInfo();
 
         return rootView;
     }

@@ -14,7 +14,7 @@ import idv.seventhmoon.spotifystreamer.fragment.PlaybackControlsFragment;
 import idv.seventhmoon.spotifystreamer.service.MediaPlayerService;
 
 /**
- * Created by fung on 23/08/2015.
+ * BaseActivity handling the screensize and control fragment
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -24,12 +24,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     private PlaybackControlsFragment mControlsFragment;
     private Intent serviceIntent;
     private int mNumberOfPane;
-
-//    public static boolean mIsLargeLayout;
-
-//    public boolean ismIsLargeLayout() {
-//        return mIsLargeLayout;
-//    }
 
     public int getNumberOfPane(){
         return mNumberOfPane;
@@ -103,6 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .commit();
     }
 
+    // Not implemented yet
 //    protected void initializeToolbar(int menu) {
 //        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 //        if (mToolbar == null) {

@@ -4,12 +4,10 @@ package idv.seventhmoon.spotifystreamer.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,36 +17,33 @@ import com.spotify.api.model.Track;
 
 import java.util.List;
 
-import idv.seventhmoon.spotifystreamer.MainApplication;
 import idv.seventhmoon.spotifystreamer.PlayerSession;
 import idv.seventhmoon.spotifystreamer.R;
 import idv.seventhmoon.spotifystreamer.fragment.ArtistListFragment;
 import idv.seventhmoon.spotifystreamer.fragment.FullScreenPlayerFragment;
-import idv.seventhmoon.spotifystreamer.fragment.PlayerFragment;
 import idv.seventhmoon.spotifystreamer.fragment.TrackListFragment;
 
 
 public class LandingActivity extends BaseActivity
         implements ArtistListFragment.OnFragmentInteractionListener,
-        TrackListFragment.OnFragmentInteractionListener,
-        PlayerFragment.OnFragmentInteractionListener {
+        TrackListFragment.OnFragmentInteractionListener{
 
     public static final String TAG = LandingActivity.class.getSimpleName();
     private static final int RESULT_SETTINGS = 1;
 
-    public static final String ARG_TRACKS = "tracks";
-    public static final String ARG_TRACK_POSITION = "track_position";
-    private static final String ARG_MEDIA_SESSION = "SpotifyStreamer";
+//    public static final String ARG_TRACKS = "tracks";
+//    public static final String ARG_TRACK_POSITION = "track_position";
+//    private static final String ARG_MEDIA_SESSION = "SpotifyStreamer";
 
     private MediaSession mMediaSession;
-
-    private MainApplication mApplication;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+//
+//    private MainApplication mApplication;
+//    private RecyclerView mRecyclerView;
+//    private RecyclerView.Adapter mAdapter;
+//    private RecyclerView.LayoutManager mLayoutManager;
     private SearchView mSearchView;
 
-    private MediaBrowser mMediaBrowser;
+//    private MediaBrowser mMediaBrowser;
 
 
 
@@ -203,43 +198,5 @@ public class LandingActivity extends BaseActivity
 
     }
 
-
-
-//    public void onPauseButtonPressed() {
-//
-//    }
-//
-//    public void onNextButtonPressed() {
-//
-//    }
-//
-//    public void onPervButtonPressed() {
-//
-//    }
-//
-//    public void onPlayButtonPressed() {
-//
-//    }
-
-//    @SuppressLint("CommitPrefEdits")
-//    public void saveTracks(List<Track> tracks) {
-//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-////        editor.putBoolean("silentMode", mSilentMode);
-//        editor.putString(ARG_TRACKS, new Gson().toJson(tracks));
-//        // Commit the edits!
-//        editor.commit();
-//    }
-//
-//    public void saveTrackPosition(int trackPosition) {
-//
-//
-//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-////        editor.putBoolean("silentMode", mSilentMode);
-//        editor.putInt(ARG_TRACK_POSITION, trackPosition);
-//        // Commit the edits!
-//        editor.commit();
-//    }
 
 }

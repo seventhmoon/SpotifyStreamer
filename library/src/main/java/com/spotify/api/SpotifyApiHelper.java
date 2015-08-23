@@ -17,6 +17,7 @@ import java.util.TreeMap;
 
 /**
  * Created by fung on 04/07/2015.
+ * API helper for using Volley to access the Soptify Web API
  */
 public class SpotifyApiHelper {
 
@@ -38,7 +39,7 @@ public class SpotifyApiHelper {
 
 
     private static String toUrlParams(Map<String, String> params) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String key : params.keySet()) {
             try {
                 sb.append("&" + key + "=" + URLEncoder.encode(params.get(key), "utf-8"));
