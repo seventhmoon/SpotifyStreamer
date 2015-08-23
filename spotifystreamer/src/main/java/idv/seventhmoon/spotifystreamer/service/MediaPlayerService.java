@@ -1,219 +1,363 @@
 package idv.seventhmoon.spotifystreamer.service;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Rating;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
+import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
+import android.os.PowerManager;
+import android.support.annotation.Nullable;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.spotify.api.model.Track;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.List;
+
+import idv.seventhmoon.spotifystreamer.PlayerSession;
 import idv.seventhmoon.spotifystreamer.R;
+import idv.seventhmoon.spotifystreamer.receiver.MediaNotificationReceiver;
 
 public class MediaPlayerService extends Service implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
 
-    public static final String TAG = MediaPlayerService.class.getSimpleName();
-    public static final String ACTION_COMMAND = "ACTION_COMMAND";
+    private static final String TAG = MediaPlayerService.class.getSimpleName();
+    // The action of the incoming Intent indicating that it contains a command
+    // to be executed (see {@link #onStartCommand})
+    public static final String ACTION_CMD = "ACTION_CMD";
+    // The key in the extras of the incoming Intent indicating the command that
+    // should be executed (see {@link #onStartCommand})
+    public static final String CMD_NAME = "CMD_NAME";
+    private static final long PROGRESS_UPDATE_INTERNAL = 100;
 
-    public static final String ACTION_PLAY = "action_play";
-    public static final String ACTION_PAUSE = "action_pause";
-    public static final String ACTION_REWIND = "action_rewind";
-    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
-    public static final String ACTION_NEXT = "action_next";
-    public static final String ACTION_PREVIOUS = "action_previous";
-    public static final String ACTION_STOP = "action_stop";
+    private final IBinder mMusicBinder = new MusicBinder();
+    private MediaPlayer mPlayer;
+    private PlayerSession mSession;
+    private MediaNotificationReceiver mMediaNotificationReceiver;
 
-    private MediaPlayer mMediaPlayer;
-    private MediaSessionManager mManager;
-    private MediaSession mSession;
-    private MediaController mController;
+    private List<MusicServiceCallback> mCallbacks;
 
+    private OnStateChangeListener mOnStateChangeListener;
+    private Handler mHandler = new Handler();
+    private boolean watchProgressUpdate = false;
+    private final Runnable mUpdateProgressTask = new Runnable() {
+        @Override
+        public void run() {
+            if (mCallbacks != null && mPlayer != null) {
+                for (MusicServiceCallback callback : mCallbacks) {
+                    try {
+                        callback.onProgressChange(mPlayer.getCurrentPosition());
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if (watchProgressUpdate) mHandler.postDelayed(this, PROGRESS_UPDATE_INTERNAL);
+        }
+    };
+
+    public PlayerSession getSession() {
+        return mSession;
+    }
+
+    public MediaPlayer getPlayer() {
+        return mPlayer;
+    }
+
+    public void setSession(PlayerSession session) {
+        if (mSession != null) {
+            stop();
+        }
+
+        this.mSession = session;
+
+        if (session == null || session.getPlaylistSize() == 0) {
+            return;
+        }
+
+        initializePlayer();
+
+        play();
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (prefs.getBoolean(getString(R.string.key_notification), true))
+            mMediaNotificationReceiver.startNotification();
+    }
+
+    public boolean isPlaying() {
+        return mPlayer != null && mPlayer.isPlaying();
+    }
+
+    public void registerCallback(MusicServiceCallback callback) {
+        if (mCallbacks == null) mCallbacks = new ArrayList<>();
+
+        mCallbacks.add(callback);
+    }
+
+    public void unregisterCallback(MusicServiceCallback callback) {
+        if (mCallbacks == null) return;
+
+        mCallbacks.remove(callback);
+    }
+
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    private void handleIntent(@NonNull Intent intent) {
-//        if( intent == null || intent.getAction() == null )
-//            return;
-
-        String action = intent.getAction();
-
-        if (action.equalsIgnoreCase(ACTION_PLAY)) {
-            mController.getTransportControls().play();
-        } else if (action.equalsIgnoreCase(ACTION_PAUSE)) {
-            mController.getTransportControls().pause();
-        } else if (action.equalsIgnoreCase(ACTION_FAST_FORWARD)) {
-            mController.getTransportControls().fastForward();
-        } else if (action.equalsIgnoreCase(ACTION_REWIND)) {
-            mController.getTransportControls().rewind();
-        } else if (action.equalsIgnoreCase(ACTION_PREVIOUS)) {
-            mController.getTransportControls().skipToPrevious();
-        } else if (action.equalsIgnoreCase(ACTION_NEXT)) {
-            mController.getTransportControls().skipToNext();
-        } else if (action.equalsIgnoreCase(ACTION_STOP)) {
-            mController.getTransportControls().stop();
-        }
-    }
-
-    private Notification.Action generateAction(int icon, String title, String intentAction) {
-        Intent intent = new Intent(getApplicationContext(), MediaPlayerService.class);
-        intent.setAction(intentAction);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
-        return new Notification.Action.Builder(icon, title, pendingIntent).build();
-    }
-
-    private void buildNotification(Notification.Action action) {
-        Notification.MediaStyle style = new Notification.MediaStyle();
-
-        Intent intent = new Intent(getApplicationContext(), MediaPlayerService.class);
-        intent.setAction(ACTION_STOP);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
-        Notification.Builder builder = new Notification.Builder(this)
-//                .setSmallIcon(R.drawable.ic_launcher)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Media Title")
-                .setContentText("Media Artist")
-                .setDeleteIntent(pendingIntent)
-                .setStyle(style);
-
-        builder.addAction(generateAction(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
-        builder.addAction(generateAction(android.R.drawable.ic_media_rew, "Rewind", ACTION_REWIND));
-        builder.addAction(action);
-        builder.addAction(generateAction(android.R.drawable.ic_media_ff, "Fast Foward", ACTION_FAST_FORWARD));
-        builder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
-        style.setShowActionsInCompactView(0, 1, 2, 3, 4);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, builder.build());
+        return mMusicBinder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (mManager == null) {
-            initMediaSessions();
+        if (intent != null) {
+            String action = intent.getAction();
+            String command = intent.getStringExtra(CMD_NAME);
+
+            if (ACTION_CMD.equals(action)) {
+                if (mPlayer == null) initializePlayer();
+                else mPlayer.reset();
+
+//                setSession((PlayerSession) intent.getParcelableExtra(FullScreenPlayerActivity.PLAYER_SESSION));
+            }
         }
 
-        handleIntent(intent);
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    private void initMediaSessions() {
-        mMediaPlayer = new MediaPlayer();
-
-        mSession = new MediaSession(getApplicationContext(), "simple player session");
-        mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
-
-        mSession.setCallback(new MediaSession.Callback() {
-                                 @Override
-                                 public void onPlay() {
-                                     super.onPlay();
-                                     Log.e("MediaPlayerService", "onPlay");
-                                     buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-                                 }
-
-                                 @Override
-                                 public void onPause() {
-                                     super.onPause();
-                                     Log.e("MediaPlayerService", "onPause");
-                                     buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
-                                 }
-
-                                 @Override
-                                 public void onSkipToNext() {
-                                     super.onSkipToNext();
-                                     Log.e("MediaPlayerService", "onSkipToNext");
-                                     //Change media here
-                                     buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-                                 }
-
-                                 @Override
-                                 public void onSkipToPrevious() {
-                                     super.onSkipToPrevious();
-                                     Log.e("MediaPlayerService", "onSkipToPrevious");
-                                     //Change media here
-                                     buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-                                 }
-
-                                 @Override
-                                 public void onFastForward() {
-                                     super.onFastForward();
-                                     Log.e("MediaPlayerService", "onFastForward");
-                                     //Manipulate current media here
-                                 }
-
-                                 @Override
-                                 public void onRewind() {
-                                     super.onRewind();
-                                     Log.e("MediaPlayerService", "onRewind");
-                                     //Manipulate current media here
-                                 }
-
-                                 @Override
-                                 public void onStop() {
-                                     super.onStop();
-                                     Log.e("MediaPlayerService", "onStop");
-                                     //Stop media player here
-                                     NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                                     notificationManager.cancel(1);
-                                     Intent intent = new Intent(getApplicationContext(), MediaPlayerService.class);
-                                     stopService(intent);
-                                 }
-
-                                 @Override
-                                 public void onSeekTo(long pos) {
-                                     super.onSeekTo(pos);
-                                 }
-
-                                 @Override
-                                 public void onSetRating(Rating rating) {
-                                     super.onSetRating(rating);
-                                 }
-                             }
-        );
+        return START_STICKY;
     }
 
     @Override
-    public boolean onUnbind(Intent intent) {
-        mSession.release();
-        return super.onUnbind(intent);
+    public void onCreate() {
+        Log.d(TAG, "MusicService onCreate");
+        super.onCreate();
+
+        initializePlayer();
+
+        mMediaNotificationReceiver = new MediaNotificationReceiver(this);
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onDestroy() {
+        mPlayer.stop();
+        mPlayer.release();
+        mPlayer = null;
 
-        //play next item
-//        if (canPlayNext()) playNext();
-//        else {
-//            if (mCallbacks != null) {
-//                for (MusicServiceCallback callback : mCallbacks) {
-//                    callback.onPlaybackStopped();
-//                }
-//            }
-//
-//            mPlayer.reset();
-//            mPlayer.release();
-//            mPlayer = null;
-//        }
+        super.onDestroy();
     }
 
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        mp.reset();
-        return false;
+    public void initializePlayer() {
+        this.mPlayer = new MediaPlayer();
+
+        mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        mPlayer.setOnPreparedListener(this);
+        mPlayer.setOnCompletionListener(this);
+        mPlayer.setOnErrorListener(this);
+    }
+
+    public void play() {
+        prepareToPlay(mSession.getCurrentTrack());
+
+        changeState(true);
+        setWatchProgressUpdate(true);
+    }
+
+    public void resume() {
+        mPlayer.start();
+
+        changeState(true);
+        setWatchProgressUpdate(true);
+    }
+
+    public void pause() {
+        mPlayer.pause();
+
+        changeState(false);
+        setWatchProgressUpdate(false);
+    }
+
+    private void stop() {
+        mPlayer.stop();
+
+        changeState(false);
+        setWatchProgressUpdate(false);
+    }
+
+    public void togglePlay() {
+        if (mPlayer == null) return;
+
+        if (mPlayer.isPlaying()) pause();
+        else resume();
+    }
+
+    public void playNext() {
+        if (canPlayNext()) {
+            Track track = mSession.getNextTrack();
+
+            if (mCallbacks != null) {
+                for (MusicServiceCallback callback : mCallbacks) {
+                    callback.onTrackChanged(track);
+                }
+            }
+
+            prepareToPlay(track);
+        }
+    }
+
+    public void playPrevious() {
+        if (canPlayPrev()) {
+            Track track = mSession.getPreviousTrack();
+
+            if (mCallbacks != null) {
+                for (MusicServiceCallback callback : mCallbacks) {
+                    callback.onTrackChanged(track);
+                }
+            }
+
+            prepareToPlay(track);
+        } else
+            seekTo(0);
+    }
+
+    public void seekTo(int position) {
+        if (mPlayer == null) return;
+
+        mPlayer.seekTo(position);
+    }
+
+    private void setWatchProgressUpdate(boolean watchProgress) {
+        this.watchProgressUpdate = watchProgress;
+
+        if (watchProgress) {
+            mUpdateProgressTask.run();
+        }
+    }
+
+    public boolean canPlayNext() {
+        if (mSession == null) return false;
+
+        int playlistSize = mSession.getPlaylistSize();
+        if (playlistSize <= 1) return false;
+
+        int nextIndex = mSession.getCurrentPosition() + 1;
+        return nextIndex >= 0 && nextIndex < playlistSize;
+    }
+
+    public boolean canPlayPrev() {
+        if (mSession == null) return false;
+
+        int playlistSize = mSession.getPlaylistSize();
+        if (playlistSize <= 1) return false;
+
+        int prevIndex = mSession.getCurrentPosition() - 1;
+        return prevIndex >= 0 && prevIndex < playlistSize;
+    }
+
+    public int getCurrentPosition() {
+        return mPlayer.getCurrentPosition();
+    }
+
+    private void prepareToPlay(Track track) {
+        if (mPlayer == null) initializePlayer();
+
+        mPlayer.reset();
+
+        try {
+            mPlayer.setDataSource(track.getPreviewUrl());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mPlayer.prepareAsync();
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-//        changeState(true);
+        changeState(true);
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        mPlayer.reset();
+
+        return false;
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        try {
+            if (canPlayNext()) {
+                playNext();
+            } else {
+                if (mCallbacks != null) {
+                    for (MusicServiceCallback callback : mCallbacks) {
+                        callback.onPlaybackStopped();
+                    }
+                }
+
+                mPlayer.reset();
+                mPlayer.release();
+                mPlayer = null;
+            }
+        } catch (ConcurrentModificationException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public class MusicBinder extends Binder {
+        public MediaPlayerService getService() {
+            return MediaPlayerService.this;
+        }
+    }
+
+    public void setOnStateChangeListener(OnStateChangeListener onStateChangeListener) {
+        this.mOnStateChangeListener = onStateChangeListener;
+    }
+
+    private void changeState(boolean isPlaying) {
+        if (mOnStateChangeListener != null) {
+            mOnStateChangeListener.onStateChanged(isPlaying);
+        }
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (prefs.getBoolean(getString(R.string.key_notification), true))
+            mMediaNotificationReceiver.updateState();
+    }
+
+    public interface OnStateChangeListener {
+        void onStateChanged(boolean isPlaying);
+    }
+
+    public interface MusicServiceCallback {
+
+        /**
+         * Called when the progress of a track has changed
+         *
+         * @param progress the progress of the track in milliseconds
+         */
+        void onProgressChange(int progress);
+
+        /**
+         * Called when a new track is set
+         *
+         * @param track the new track to be played
+         */
+        void onTrackChanged(Track track);
+
+        /**
+         * Called when the playlist is completed and playback stopped
+         */
+        void onPlaybackStopped();
     }
 }

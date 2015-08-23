@@ -1,7 +1,8 @@
-package idv.seventhmoon.spotifystreamer;
+package idv.seventhmoon.spotifystreamer.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -9,8 +10,14 @@ import com.spotify.api.model.Track;
 
 import java.util.List;
 
+import idv.seventhmoon.spotifystreamer.PlayerSession;
+import idv.seventhmoon.spotifystreamer.R;
+import idv.seventhmoon.spotifystreamer.fragment.FullScreenPlayerFragment;
+import idv.seventhmoon.spotifystreamer.fragment.PlayerFragment;
+import idv.seventhmoon.spotifystreamer.fragment.TrackListFragment;
 
-public class TrackListActivity extends AppCompatActivity implements TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener{
+
+public class TrackListActivity extends BaseActivity implements TrackListFragment.OnFragmentInteractionListener, PlayerFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +58,35 @@ public class TrackListActivity extends AppCompatActivity implements TrackListFra
     }
 
 
-
     @Override
-    public void onTrackSelected(List<Track> tracks, int trackNumber) {
+    public void onTrackSelected(List<Track> tracks, int trackPosition) {
 //        Toast.makeText(this, getString(R.string.text_not_implemented), Toast.LENGTH_SHORT).show();
 
-        //for phase 2
-        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackNumber);
-        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
-        fragmentTransaction.commit();
+        //for phase 2 test
+//        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackNumber);
+//        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.fragment_placeholder, fragment);
+//        fragmentTransaction.commit();
 //        fragment.show(getSupportFragmentManager(), fragment.getClass().getSimpleName());
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+//        Track currnetTrack = tracks.get(trackNumber);
+
+        PlayerSession playerSession = new PlayerSession(tracks, trackPosition);
+
+        if (getNumberOfPane() == 1){
+            Intent intent = new Intent(this, FullScreenPlayerActivity.class);
+            intent.putExtra(FullScreenPlayerActivity.PLAYER_SESSION, playerSession);
+
+            startActivity(intent);
+        }else {
+            FullScreenPlayerFragment fragment = new FullScreenPlayerFragment();
+            Bundle arguments = new Bundle();
+
+            arguments.putParcelable(FullScreenPlayerActivity.PLAYER_SESSION, playerSession);
+            fragment.setArguments(arguments);
+            fragment.show(fragmentManager, "PLAYER");
+        }
+
     }
 }

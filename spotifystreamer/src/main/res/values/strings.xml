@@ -28,5 +28,15 @@
     <string name="text_network_bad_request">Network Error - Bad Request.</string>
     <string name="key_locale">pref_locale</string>
     <string name="key_notification">pref_notification</string>
-
+    <string name="currently_playing_song">Now Playing...</string>
+    <string name="currently_playing_artist">Artist</string>
+    <string name="currently_playing_extra_info">Extra Info</string>
+    <string name="play_pause">Play / Pause</string>
+    <string name="action_share">Share</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="album_art" >Album Art</string>
+    <string name="skip_next">skip to next</string>
+    <string name="skip_prev">skip to previous</string>
+    <string name="label_pause">Pause</string>
+    <string name="label_play">Play</string>
 </resources>

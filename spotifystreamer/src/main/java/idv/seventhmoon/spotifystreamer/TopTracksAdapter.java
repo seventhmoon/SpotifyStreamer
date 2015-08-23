@@ -14,6 +14,8 @@ import com.spotify.api.model.Track;
 
 import java.util.List;
 
+import idv.seventhmoon.spotifystreamer.fragment.TrackListFragment;
+
 /**
  * Adapter for building up the RecyclerView for displar
  * Created by fung on 05/07/2015.

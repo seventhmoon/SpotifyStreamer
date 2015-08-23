@@ -14,6 +14,8 @@ import com.spotify.api.model.Image;
 
 import java.util.List;
 
+import idv.seventhmoon.spotifystreamer.fragment.ArtistListFragment;
+
 /**
  * Adapter for building up the RecyclerView for display
  * Created by fung on 05/07/2015.

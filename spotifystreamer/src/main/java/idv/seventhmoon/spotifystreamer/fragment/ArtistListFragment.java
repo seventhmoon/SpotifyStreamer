@@ -1,4 +1,4 @@
-package idv.seventhmoon.spotifystreamer;
+package idv.seventhmoon.spotifystreamer.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,6 +19,10 @@ import com.spotify.api.model.Artist;
 import com.spotify.api.model.SearchArtistResponseModel;
 
 import java.util.List;
+
+import idv.seventhmoon.spotifystreamer.MainApplication;
+import idv.seventhmoon.spotifystreamer.R;
+import idv.seventhmoon.spotifystreamer.SearchArtistResultAdapter;
 
 //receive keyword from activity, call API, display result
 //when cell clicked, pass the albumId to search tracks

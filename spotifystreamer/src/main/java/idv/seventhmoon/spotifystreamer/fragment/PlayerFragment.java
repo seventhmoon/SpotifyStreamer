@@ -1,4 +1,4 @@
-package idv.seventhmoon.spotifystreamer;
+package idv.seventhmoon.spotifystreamer.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import idv.seventhmoon.spotifystreamer.MainApplication;
+import idv.seventhmoon.spotifystreamer.R;
 
 
 /**
@@ -97,7 +100,7 @@ public class PlayerFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_player0, container, false);
 
         mTextViewAlbumArtist = (TextView) rootView.findViewById(R.id.text_album_artist);
         mTextViewAlbumName = (TextView) rootView.findViewById(R.id.text_album_name);

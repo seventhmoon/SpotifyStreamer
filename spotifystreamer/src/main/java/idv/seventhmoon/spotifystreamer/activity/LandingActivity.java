@@ -1,36 +1,34 @@
 package idv.seventhmoon.spotifystreamer.activity;
 
 
-import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.google.gson.Gson;
 import com.spotify.api.model.Track;
 
 import java.util.List;
 
-import idv.seventhmoon.spotifystreamer.ArtistListFragment;
 import idv.seventhmoon.spotifystreamer.MainApplication;
-import idv.seventhmoon.spotifystreamer.PlayerFragment;
+import idv.seventhmoon.spotifystreamer.PlayerSession;
 import idv.seventhmoon.spotifystreamer.R;
-import idv.seventhmoon.spotifystreamer.TrackListActivity;
-import idv.seventhmoon.spotifystreamer.TrackListFragment;
+import idv.seventhmoon.spotifystreamer.fragment.ArtistListFragment;
+import idv.seventhmoon.spotifystreamer.fragment.FullScreenPlayerFragment;
+import idv.seventhmoon.spotifystreamer.fragment.PlayerFragment;
+import idv.seventhmoon.spotifystreamer.fragment.TrackListFragment;
 
 
-public class LandingActivity extends AppCompatActivity
+public class LandingActivity extends BaseActivity
         implements ArtistListFragment.OnFragmentInteractionListener,
         TrackListFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener {
@@ -162,8 +160,27 @@ public class LandingActivity extends AppCompatActivity
 
     @Override
     public void onTrackSelected(List<Track> tracks, int trackPosition) {
-        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackPosition);
-        fragment.show(getSupportFragmentManager(), TAG);
+//        PlayerFragment fragment = PlayerFragment.newInstance(tracks, trackPosition);
+//        fragment.show(getSupportFragmentManager(), TAG);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+//        Track currnetTrack = tracks.get(trackPosition);
+
+        PlayerSession playerSession = new PlayerSession(tracks, trackPosition);
+
+        if (getNumberOfPane() == 1){
+            Intent intent = new Intent(this, FullScreenPlayerActivity.class);
+            intent.putExtra(FullScreenPlayerActivity.PLAYER_SESSION, playerSession);
+
+            startActivity(intent);
+        }else {
+            FullScreenPlayerFragment fragment = new FullScreenPlayerFragment();
+            Bundle arguments = new Bundle();
+
+            arguments.putParcelable(FullScreenPlayerActivity.PLAYER_SESSION, playerSession);
+            fragment.setArguments(arguments);
+            fragment.show(fragmentManager, "PLAYER");
+        }
     }
 
 
@@ -171,7 +188,7 @@ public class LandingActivity extends AppCompatActivity
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.settings:
+            case R.id.menu_settings:
                 Intent detailIntent = new Intent(this,
                         SettingsActivity.class);
 
@@ -188,41 +205,41 @@ public class LandingActivity extends AppCompatActivity
 
 
 
-    public void onPauseButtonPressed() {
+//    public void onPauseButtonPressed() {
+//
+//    }
+//
+//    public void onNextButtonPressed() {
+//
+//    }
+//
+//    public void onPervButtonPressed() {
+//
+//    }
+//
+//    public void onPlayButtonPressed() {
+//
+//    }
 
-    }
-
-    public void onNextButtonPressed() {
-
-    }
-
-    public void onPervButtonPressed() {
-
-    }
-
-    public void onPlayButtonPressed() {
-
-    }
-
-    @SuppressLint("CommitPrefEdits")
-    public void saveTracks(List<Track> tracks) {
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putBoolean("silentMode", mSilentMode);
-        editor.putString(ARG_TRACKS, new Gson().toJson(tracks));
-        // Commit the edits!
-        editor.commit();
-    }
-
-    public void saveTrackPosition(int trackPosition) {
-
-
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putBoolean("silentMode", mSilentMode);
-        editor.putInt(ARG_TRACK_POSITION, trackPosition);
-        // Commit the edits!
-        editor.commit();
-    }
+//    @SuppressLint("CommitPrefEdits")
+//    public void saveTracks(List<Track> tracks) {
+//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+////        editor.putBoolean("silentMode", mSilentMode);
+//        editor.putString(ARG_TRACKS, new Gson().toJson(tracks));
+//        // Commit the edits!
+//        editor.commit();
+//    }
+//
+//    public void saveTrackPosition(int trackPosition) {
+//
+//
+//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+////        editor.putBoolean("silentMode", mSilentMode);
+//        editor.putInt(ARG_TRACK_POSITION, trackPosition);
+//        // Commit the edits!
+//        editor.commit();
+//    }
 
 }
