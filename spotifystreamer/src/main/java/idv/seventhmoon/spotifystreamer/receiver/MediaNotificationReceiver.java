@@ -189,8 +189,12 @@ public class MediaNotificationReceiver extends BroadcastReceiver {
 
         // If skip to previous action is enabled
         if (mMusicService.canPlayPrev()) {
-            notificationBuilder.addAction(R.drawable.ic_skip_previous_white_24dp,
+
+            Notification.Action.Builder actionBuilder = new Notification.Action.Builder(R.drawable.ic_skip_previous_white_24dp,
                     mMusicService.getString(R.string.skip_prev), mPreviousIntent);
+            Notification.Action action = actionBuilder.build();
+            notificationBuilder.addAction(action);
+
 
             // If there is a "skip to previous" button, the play/pause button will
             // be the second one. We need to keep track of it, because the MediaStyle notification
@@ -203,8 +207,15 @@ public class MediaNotificationReceiver extends BroadcastReceiver {
 
         // If skip to next action is enabled
         if (mMusicService.canPlayNext()) {
-            notificationBuilder.addAction(R.drawable.ic_skip_next_white_24dp,
+
+            Notification.Action.Builder actionBuilder = new Notification.Action.Builder(R.drawable.ic_skip_next_white_24dp,
                     mMusicService.getString(R.string.skip_next), mNextIntent);
+            Notification.Action action = actionBuilder.build();
+            notificationBuilder.addAction(action);
+
+
+//            notificationBuilder.addAction(R.drawable.ic_skip_next_white_24dp,
+//                    mMusicService.getString(R.string.skip_next), mNextIntent);
         }
 
 
@@ -246,7 +257,7 @@ public class MediaNotificationReceiver extends BroadcastReceiver {
             icon = R.drawable.ic_play_arrow_white_24dp;
             intent = mPlayIntent;
         }
-        builder.addAction(new Notification.Action(icon, label, intent));
+        builder.addAction(new Notification.Action.Builder(icon, label, intent).build());
     }
 
     private void setNotificationPlaybackState(Notification.Builder builder) {
