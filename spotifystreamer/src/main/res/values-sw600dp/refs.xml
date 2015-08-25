@@ -1,0 +1,3 @@
+<resources>
+    <item type="layout" name="activity_landing">@layout/activity_landing_twopane</item>
+</resources>
